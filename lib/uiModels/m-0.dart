@@ -154,7 +154,7 @@ class Scene_0 extends StatelessWidget {
                     ),
                     InkWell(
                       onTap: () {
-                        print("직접 신청하기");
+                        // print("직접 신청하기");
                         Navigator.of(context)
                             .push(MaterialPageRoute(builder: (context) {
                           return const Scene_2();

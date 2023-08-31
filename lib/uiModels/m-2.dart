@@ -1,10 +1,19 @@
+import 'package:a08_mr_hong/api_service.dart';
 import 'package:a08_mr_hong/main_temp.dart';
 import 'package:a08_mr_hong/uiModels/m-3.dart';
 import 'package:flutter/material.dart';
 
+import '../dataModels/category.dart';
+
 // double baseWidth = 428;
 // double fem = 0;
 // double ffem = 0;
+
+List<String> price = [
+  "5,000원",
+  "6,000원",
+  "7,000원",
+];
 
 class Scene_2 extends StatelessWidget {
   const Scene_2({super.key});
@@ -16,6 +25,15 @@ class Scene_2 extends StatelessWidget {
     double ffem = fem * 0.97;
 
     final textContorllerSearch = TextEditingController();
+
+    Future getCategory() async {
+      Category data = await ApiService.getCategory();
+      // await ApiService.getHong();
+
+      // print("### await ApiService.PostTest()");
+      // await ApiService.PostTest();
+      return data;
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -191,17 +209,24 @@ class Scene_2 extends StatelessWidget {
                       SizedBox(
                         width: double.infinity,
                         height: 690,
-                        child: ListView.separated(
-                          scrollDirection: Axis.vertical,
-                          itemCount: 20,
-                          //  padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                          itemBuilder: (context, index) {
-                            //  var webtoon = snapshot.data![index];
-                            return _ListItem(fem, ffem, context);
-                          },
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 8),
-                        ),
+                        child: FutureBuilder(
+                            future: getCategory(),
+                            builder: ((context, snapshot) {
+                              if (snapshot.hasData) {
+                                // 데이터가 있을때 위젯 렌더링
+                                // Category data = snapshot.data;
+                                print("snapshot.hasData : OK");
+
+                                // print("snapshot.data : ${snapshot.data}");
+                                return _MakeList(fem, ffem, snapshot.data);
+                              }
+                              if (snapshot.hasError) {
+                                // 에러가 났을때 위젯 렌더링
+                                return const Text("Error");
+                              }
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            })),
                       ),
 
                       // _ListItem(fem, ffem)
@@ -218,11 +243,29 @@ class Scene_2 extends StatelessWidget {
     );
   }
 
-  InkWell _ListItem(double fem, double ffem, BuildContext context) {
+  ListView _MakeList(double fem, double ffem, Category data) {
+    print("_MakeList data.code:\n${data.data.length}");
+
+    return ListView.separated(
+      scrollDirection: Axis.vertical,
+      itemCount: data.data.length,
+      //  padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+      itemBuilder: (context, index) {
+        //  var webtoon = snapshot.data![index];
+        return _ListItem(fem, ffem, context, data.data[index].toJson());
+      },
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
+    );
+  }
+
+  InkWell _ListItem(double fem, double ffem, BuildContext context,
+      Map<String, dynamic> data) {
+    print("_ListItem : ${data["name"]}");
+
     return InkWell(
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return const Scene_3();
+          return Scene_3(id: data["id"], category: data["name"]);
         }));
       },
       child: Container(
@@ -251,11 +294,12 @@ class Scene_2 extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30.0249996185 * fem),
                 border: Border.all(color: const Color(0xffffffff)),
-                image: const DecorationImage(
+                image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: AssetImage(
-                    'assets/page-1/images/ellipse-6-bg-iQ1.png',
-                  ),
+                  image: NetworkImage(data["image"]),
+                  // image: AssetImage(
+                  //   'assets/page-1/images/ellipse-6-bg-iQ1.png',
+                  // ),
                 ),
               ),
             ),
@@ -273,7 +317,7 @@ class Scene_2 extends StatelessWidget {
                     margin:
                         EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 8 * fem),
                     child: Text(
-                      '프린트',
+                      data["name"],
                       style: SafeGoogleFont(
                         'Montserrat',
                         fontSize: 14 * ffem,
@@ -304,7 +348,7 @@ class Scene_2 extends StatelessWidget {
                         Container(
                           // 2wj (7:650)
                           child: Text(
-                            '프린트 하시는것을 도와드려요!',
+                            data["description"],
                             style: SafeGoogleFont(
                               'Montserrat',
                               fontSize: 12 * ffem,
@@ -327,7 +371,7 @@ class Scene_2 extends StatelessWidget {
                 margin:
                     EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 16 * fem),
                 child: Text(
-                  '5,000 원',
+                  price[(data["id"] - 1) % 3],
                   textAlign: TextAlign.center,
                   style: SafeGoogleFont(
                     'Montserrat',

@@ -1,8 +1,22 @@
+import 'package:a08_mr_hong/api_service.dart';
+import 'package:a08_mr_hong/dataModels/reqJob.dart';
 import 'package:a08_mr_hong/main_temp.dart';
 import 'package:flutter/material.dart';
 
 class Scene_3 extends StatelessWidget {
-  const Scene_3({super.key});
+  Scene_3({
+    super.key,
+    required this.id,
+    required this.category,
+  });
+
+  String category;
+  int id;
+  List<String> reqText = [
+    "안녕하세요.\n부모님 폰에 공인인증서 설치 요청합니다.\n빠른 배정 부탁드립니다",
+    "안녕하세요.\n부모님 폰에 울산페이 설치 요청합니다.\n빠른 배정 부탁드립니다",
+    "안녕하세요.\n프린트 하시는 것을 도움 부탁드립니다.\n빠른 배정 부탁드립니다",
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -10,11 +24,13 @@ class Scene_3 extends StatelessWidget {
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
 
-    final textContorllerCategory = TextEditingController(text: "초기값");
-    final textContorllerText = TextEditingController();
-    final textContorllerAddr = TextEditingController();
-    final textContorllerPhone = TextEditingController();
-    final textContorllerReqPhone = TextEditingController();
+    final textContorllerCategory = TextEditingController(text: category);
+    final textContorllerText =
+        TextEditingController(text: reqText[(id - 1) % 3]);
+    final textContorllerAddr =
+        TextEditingController(text: "부산 해운대구 오션APT 101동 101호");
+    final textContorllerPhone = TextEditingController(text: "010-1234-5678");
+    final textContorllerReqPhone = TextEditingController(text: "010-8080-4081");
 
     return Scaffold(
       body: SafeArea(
@@ -158,6 +174,7 @@ class Scene_3 extends StatelessWidget {
                                     width: 350 * fem,
                                     height: 44 * fem,
                                     child: TextField(
+                                      readOnly: true,
                                       controller: textContorllerCategory,
                                       decoration: const InputDecoration(
                                         border: InputBorder.none,
@@ -623,6 +640,16 @@ class Scene_3 extends StatelessWidget {
                                 ),
                                 child: InkWell(
                                   onTap: () async {
+                                    ReqJob reqJob = ReqJob.fromJson({
+                                      "categoryId": id,
+                                      "content": textContorllerText.text,
+                                      "memberId": 3,
+                                      "silverPhoneNumber":
+                                          textContorllerPhone.text,
+                                      "requestAddress": textContorllerAddr.text,
+                                    });
+                                    print("ApiService.PostTest(reqJob);");
+                                    await ApiService.PostTest(reqJob);
                                     await showDialog<void>(
                                       context: context,
                                       builder: (BuildContext context) {

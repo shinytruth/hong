@@ -1,5 +1,5 @@
 import 'package:a08_mr_hong/api_service.dart';
-import 'package:a08_mr_hong/dataModels/Jobs.dart';
+import 'package:a08_mr_hong/dataModels/category.dart';
 import 'package:a08_mr_hong/uiModels/m-0.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -185,7 +185,7 @@ class TestAPI extends StatefulWidget {
 
 class _TestAPIState extends State<TestAPI> {
   Future GetTest() async {
-    Jobs data = await ApiService.GetTest();
+    Category data = await ApiService.getCategory();
     // await ApiService.PostTest();
     return data;
   }
@@ -211,12 +211,12 @@ class _TestAPIState extends State<TestAPI> {
             if (snapshot.hasData) {
               // 데이터가 있을때 위젯 렌더링
               print("snapshot.hasData");
-              Jobs data = snapshot.data;
+              Category data = snapshot.data;
 
-              return Column(
+              return const Column(
                 children: [
-                  const Text("OK"),
-                  Text("${data.getJobs()['code']}"),
+                  Text("OK"),
+                  // Text("${data.getJobs()['code']}"),
                 ],
               );
             }
